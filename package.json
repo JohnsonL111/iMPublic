@@ -24,7 +24,7 @@
     "test": "nx run-many --target=test --all",
     "lint": "nx run-many --target=lint --all",
     "e2e": "ng e2e",
-    "api:e2e": "ng e2e api-e2e --runInBand",
+    "api:e2e": "ng e2e api-e2e --runInBand --debug",
     "code:line:count": "ts-node ./tools/scripts/code-line-count.ts",
     "pretty": "prettier --write \"{,!(node_modules)/**/}*.{ts,scss,html,json}\"",
     "affected:apps": "nx affected:apps",
@@ -41,7 +41,9 @@
     "update": "nx migrate latest",
     "workspace-generator": "nx workspace-generator",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "logJestPath": "echo ${workspaceFolder}/node_modules/jest/bin/jest"
+    
   },
   "browser": {
     "fs": false,

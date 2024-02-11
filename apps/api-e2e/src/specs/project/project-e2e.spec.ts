@@ -40,7 +40,7 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppTestModule],
+      imports: [AppTestModule], // change this to the new server module (augment for testing?)
       providers: [DatabaseService],
     }).compile();
 
