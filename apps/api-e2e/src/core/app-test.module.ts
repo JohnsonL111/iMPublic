@@ -6,7 +6,6 @@ import {
   initializeTransactionalContext,
   patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
-import {ServerModule} from '../server/server.module'
 
 jest.setTimeout(60000);
 
@@ -16,7 +15,6 @@ patchTypeORMRepositoryWithBaseRepository();
 @Module({
   imports: [
     ServerOrchaModule,
-    ServerModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: '127.0.0.1',

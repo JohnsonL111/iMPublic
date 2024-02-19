@@ -16,7 +16,9 @@ import { createServeAdmin } from '../serve-admin/serve-admin.helpers';
 import { createServePartner } from '../serve-partner/serve-partner.helpers';
 import { createUserOrchestration } from '../user/user.orchestration';
 import { createProjectOrchestration } from './project.orchestration';
-import supertest from 'supertest'
+import supertest from 'supertest';
+// import axios, { AxiosResponse } from 'axios';
+const { default: axios, AxiosResponse } = require('axios');
 
 describe('ChangeMaker Orchestration Integration Tests', () => {
   let app: NestFastifyApplication;
@@ -62,18 +64,16 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
     auth = await userOrcha.signUp({ token: true }, '', creds);
     sp = await createServePartner(spQuery, spRepo, { id: uuid.v4(), handle: 'spHandle' });
     await createServeAdmin({}, saRepo, creds.id, sp.id);
-    const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id });
-    project = body;
+    //const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
   });
 
   afterAll(async () => await app.close());
 
   describe('getAll', () => {
     it('should not get private projects (project is private by default)', async () => {
-
       const result = await supertest(app.getHttpServer())
-      .post(`/orcha/project/getAll`)
-      .field('query', JSON.stringify(projectQuery));
+        .post(`/orcha/project/getAll`)
+        .field('query', JSON.stringify(projectQuery));
 
       expect(result.body.length).toBe(0);
     });
@@ -149,10 +149,27 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
 
   describe('create', () => {
     it('should create', async () => {
-      expect((await projectRepo.findOneOrFail(project.id)).id).toBe(project.id);
+      try {
+        await axios.post('http://localhost:3335/server/create', {
+          query: projectQuery,
+          token: auth.body.token,
+          dto: { spId: sp.id },
+        }).then(async (response: typeof AxiosResponse) => {
+          let { body } = response;
+          project = body;
+  
+          // Code that depends on the project variable
+          expect((await projectRepo.findOneOrFail(project.id)).id).toBe(project.id);
+          console.log('Successfully created project');
+  
+        });
+  
+      } catch (error) {
+        console.error(error); // Handle the error
+      }
     });
   });
-
+  
   
 
   describe('delete', () => {

@@ -30,6 +30,7 @@ import { DbTransactionCreator } from './transaction-creator/transaction-creator.
 import { TransactionService } from './transaction/transaction.service';
 import { UserService } from './user/user.service';
 import { VoucherService } from './voucher/voucher.service';
+import {ServerModule} from 'libs/server/api/server.module'
 
 const services: Provider[] = [
   {
@@ -69,6 +70,7 @@ const services: Provider[] = [
 @Module({
   imports: [
     HttpModule,
+    ServerModule,
     ServerCoreDomainServicesModule,
     JwtModule.register({
       secret: 'secretKey',
