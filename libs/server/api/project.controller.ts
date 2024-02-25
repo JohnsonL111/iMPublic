@@ -3,8 +3,8 @@ import { CreateProjectDto, Project } from '@involvemint/shared/domain';
 import { Controller, Post } from '@nestjs/common';
 import { IExactQueryObject } from '@orcha/common/src/lib/query';
 
-@Controller('server')
-export class ServerController {
+@Controller('project')
+export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post('create')
