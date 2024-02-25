@@ -64,7 +64,7 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
     auth = await userOrcha.signUp({ token: true }, '', creds);
     sp = await createServePartner(spQuery, spRepo, { id: uuid.v4(), handle: 'spHandle' });
     await createServeAdmin({}, saRepo, creds.id, sp.id);
-    //const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
+    const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
 
     try {
       const { data } = await axios.post('http://localhost:3335/project/create', {
