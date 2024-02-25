@@ -9,6 +9,13 @@ export class ProjectController {
 
   @Post('create')
   async create(query: IExactQueryObject<Project, { id: true; }>, token: string, dto: CreateProjectDto) {
-    return this.projectService.create(query, token, dto);
+    try {
+      const result = await this.projectService.create(query, token, dto);
+      return { success: true, data: result };
+    } catch (error) {
+      // Handle errors here
+      console.error('Error creating project:', error);
+      return { success: false, error: error.message };
+    }
   }
 }

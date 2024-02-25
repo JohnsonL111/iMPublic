@@ -65,6 +65,26 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
     sp = await createServePartner(spQuery, spRepo, { id: uuid.v4(), handle: 'spHandle' });
     await createServeAdmin({}, saRepo, creds.id, sp.id);
     //const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
+
+    try {
+      const { data } = await axios.post('http://localhost:3335/project/create', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { spId: sp.id !== undefined ? sp.id : null },
+      });
+    
+      if (data.success) {
+        // Assuming the server returns the project data in the 'data' property for a successful response
+        project = data.data;
+        // Additional handling or processing if needed
+      } else {
+        // Handle the case where the server reports failure
+        console.error('Error creating project:', data.error);
+      }
+    } catch (error) {
+      // Handle network errors or other issues
+      console.error('Error creating project:', error);
+    }
   });
 
   afterAll(async () => await app.close());
@@ -149,28 +169,9 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
 
   describe('create', () => {
     it('should create', async () => {
-      try {
-        await axios.post('http://localhost:3335/server/create', {
-          query: projectQuery,
-          token: auth.body.token,
-          dto: { spId: sp.id },
-        }).then(async (response: typeof AxiosResponse) => {
-          let { body } = response;
-          project = body;
-  
-          // Code that depends on the project variable
-          expect((await projectRepo.findOneOrFail(project.id)).id).toBe(project.id);
-          console.log('Successfully created project');
-  
-        });
-  
-      } catch (error) {
-        console.error(error); // Handle the error
-      }
+      expect((await projectRepo.findOneOrFail(project.id)).id).toBe(project.id);
     });
   });
-  
-  
 
   describe('delete', () => {
     it('should delete', async () => {
