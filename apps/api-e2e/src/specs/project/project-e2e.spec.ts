@@ -64,7 +64,7 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
     auth = await userOrcha.signUp({ token: true }, '', creds);
     sp = await createServePartner(spQuery, spRepo, { id: uuid.v4(), handle: 'spHandle' });
     await createServeAdmin({}, saRepo, creds.id, sp.id);
-    const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
+    //const { body } = await projectOrcha.create(projectQuery, auth.body.token, { spId: sp.id }); // takes the body prop from return
 
     try {
       const { data } = await axios.post('http://localhost:3335/project/create', {
@@ -98,37 +98,84 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
       expect(result.body.length).toBe(0);
     });
     it('should not get unlisted projects', async () => {
-      await projectRepo.update(project.id, { listingStatus: 'unlisted' });
-      const res = await projectOrcha.getAll(projectQuery, auth.body.token, {});
+      await projectRepo.update(project.id, { listingStatus: 'unlisted' }); 
+      //const res = await projectOrcha.getAll(projectQuery, auth.body.token, {}); // replace
+      
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getAll', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { },
+      });
+      
       expect(res.body.length).toBe(0);
     });
     it('should get public projects', async () => {
-      await projectRepo.update(project.id, { listingStatus: 'public' });
-      const res = await projectOrcha.getAll(projectQuery, auth.body.token, {});
+      await projectRepo.update(project.id, { listingStatus: 'public' }); 
+      //const res = await projectOrcha.getAll(projectQuery, auth.body.token, {}); // replace
+      
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getAll', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { },
+      });
+      
       expect(res.body[0].id).toBe(project.id);
     });
   });
 
   describe('getOne', () => {
     it('should not get private project (project is private by default)', async () => {
-      const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id });
+      //const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id }); // replace
+      
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getOne', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { projectId: project.id},
+      });
+      
       expect(res.statusCode).toBe(HttpStatus.UNAUTHORIZED);
     });
     it('should get unlisted project', async () => {
-      await projectRepo.update(project.id, { listingStatus: 'unlisted' });
-      const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id });
+      await projectRepo.update(project.id, { listingStatus: 'unlisted' }); 
+      //const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id }); // replace
+      
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getOne', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { projectId: project.id},
+      });
+
       expect(res.body.id).toBe(project.id);
     });
     it('should get public project', async () => {
-      await projectRepo.update(project.id, { listingStatus: 'public' });
-      const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id });
+      await projectRepo.update(project.id, { listingStatus: 'public' }); 
+      //const res = await projectOrcha.getOne(projectQuery, auth.body.token, { projectId: project.id }); // replace
+      
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getOne', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { projectId: project.id},
+      });
+      
       expect(res.body.id).toBe(project.id);
     });
   });
 
   describe('getAllOwnedBySp', () => {
     it('should get only projects owned by me', async () => {
-      const res = await projectOrcha.getAllOwnedBySp(projectQuery, auth.body.token, { spId: sp.id });
+      // const res = await projectOrcha.getAllOwnedBySp(projectQuery, auth.body.token, { spId: sp.id }); // replace
+      // axios call
+      const res = await axios.post('http://localhost:3335/project/getAllOwnedBySp', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { spId : sp.id},
+      });
+      
       expect(res.body[0].id).toBe(project.id);
     });
     it('should not get projects not owned by me', async () => {
@@ -161,8 +208,15 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
         },
         spQuery
       );
-      await projectRepo.update(project.id, { servePartner: newSpId });
-      const res = await projectOrcha.getAllOwnedBySp(projectQuery, auth.body.token, { spId: sp.id });
+      await projectRepo.update(project.id, { servePartner: newSpId }); 
+      // const res = await projectOrcha.getAllOwnedBySp(projectQuery, auth.body.token, { spId: sp.id }); // replac 
+      
+      const res = await axios.post('http://localhost:3335/project/getAllOwnedBySp', {
+        query: projectQuery,
+        token: auth.body.token,
+        dto: { spId : sp.id},
+      });
+      
       expect(res.body.length).toBe(0);
     });
   });
@@ -175,12 +229,19 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
 
   describe('delete', () => {
     it('should delete', async () => {
-      expect(await projectRepo.findOne(project.id)).toBeTruthy();
-      expect(
-        (await projectOrcha.delete({ deletedId: true }, auth.body.token, { projectId: project.id })).body
-          .deletedId
-      ).toBe(project.id);
-      expect(await projectRepo.findOne(project.id)).toBeFalsy();
+      expect(await projectRepo.findOne(project.id)).toBeTruthy(); 
+      // expect(
+      //   (await projectOrcha.delete({ deletedId: true }, auth.body.token, { projectId: project.id })).body // replace
+      //     .deletedId
+      // ).toBe(project.id);
+
+      expect(await axios.post('http://localhost:3335/project/delete', {
+        query: { deletedId: true },
+        token: auth.body.token,
+        dto: { projectId: project.id},
+      }).body.deletedId).toBe(project.id)
+
+      expect(await projectRepo.findOne(project.id)).toBeFalsy(); 
     });
   });
 });
