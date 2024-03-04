@@ -25,7 +25,7 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
   let db: DatabaseService;
 
   let userOrcha: ITestOrchestration<IUserOrchestration>;
-  let projectOrcha: ITestOrchestration<IProjectOrchestration>;
+  //let projectOrcha: ITestOrchestration<IProjectOrchestration>;
 
   let spRepo: ServePartnerRepository;
   let saRepo: ServeAdminRepository;
@@ -50,7 +50,7 @@ describe('ChangeMaker Orchestration Integration Tests', () => {
     db = moduleRef.get(DatabaseService);
 
     userOrcha = createUserOrchestration(app);
-    projectOrcha = createProjectOrchestration(app);
+    //projectOrcha = createProjectOrchestration(app);
 
     spRepo = moduleRef.get(ServePartnerRepository);
     saRepo = moduleRef.get(ServeAdminRepository);
