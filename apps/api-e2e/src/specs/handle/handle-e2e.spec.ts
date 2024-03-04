@@ -6,12 +6,13 @@ import { ITestOrchestration } from '@orcha/testing';
 import { AppTestModule } from '../../core/app-test.module';
 import { DatabaseService } from '../../core/database.service';
 import { createHandleOrchestration } from './handle.orchestration';
+const { default: axios, AxiosResponse } = require('axios');
 
 describe('Handle Orchestration Integration Tests', () => {
   let app: INestApplication;
   let db: DatabaseService;
 
-  let handleOrcha: ITestOrchestration<IHandleOrchestration>;
+  //let handleOrcha: ITestOrchestration<IHandleOrchestration>;
 
   let handleRepo: HandleRepository;
 
@@ -25,7 +26,7 @@ describe('Handle Orchestration Integration Tests', () => {
     db = moduleRef.get(DatabaseService);
     handleRepo = moduleRef.get(HandleRepository);
 
-    handleOrcha = createHandleOrchestration(app);
+    //handleOrcha = createHandleOrchestration(app);
 
     await app.init();
   });
@@ -38,12 +39,25 @@ describe('Handle Orchestration Integration Tests', () => {
 
   describe('verifyHandle', () => {
     it('should verify handle is unique', async () => {
-      const { body } = await handleOrcha.verifyHandle({ isUnique: true }, '', { handle: 'myHandle' });
+      // const { body } = await handleOrcha.verifyHandle({ isUnique: true }, '', { handle: 'myHandle' });
+      const { body } = await axios.post('http://localhost:3335/handle/verifyHandle', {
+        query: { isUnique: true },
+        token: '',
+        dto: { handle: 'myHandle' },
+      });
+
+
       expect(body.isUnique).toBe(true);
     });
     it('should verify handle is not unique', async () => {
       await handleRepo.upsert({ id: 'myHandle' });
-      const { body } = await handleOrcha.verifyHandle({ isUnique: true }, '', { handle: 'myHandle' });
+      // const { body } = await handleOrcha.verifyHandle({ isUnique: true }, '', { handle: 'myHandle' });
+      const { body } = await axios.post('http://localhost:3335/handle/verifyHandle', {
+        query: { isUnique: true },
+        token: '',
+        dto: { handle: 'myHandle' },
+      });
+
       expect(body.isUnique).toBe(false);
     });
   });
